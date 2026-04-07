@@ -55,6 +55,14 @@
       line-height: 1.5;
     }
 
+    .section-title {
+      margin: 28px 0 14px;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
     .buttons {
       display: grid;
       gap: 14px;
@@ -223,6 +231,19 @@
       </a>
     </div>
 
+    <h2 class="section-title">Тестовые лендинги</h2>
+    <div class="buttons">
+      <a class="button-link" href="https://nuxtlanidng.vercel.app/" target="_blank" rel="noreferrer">
+        <button type="button">Nuxt landing</button>
+      </a>
+      <a class="button-link" href="https://nextlanding-beta.vercel.app/" target="_blank" rel="noreferrer">
+        <button type="button">Next landing</button>
+      </a>
+      <a class="button-link" href="https://purehtml.vercel.app/" target="_blank" rel="noreferrer">
+        <button type="button">Pure HTML</button>
+      </a>
+    </div>
+
     <div class="footer">Одностраничная HTML-страница с 4 кнопками</div>
   </main>
   <script>
@@ -266,9 +287,9 @@
       }
 
       document.addEventListener('DOMContentLoaded', function () {
-        var buttonsEl = document.querySelector('.buttons');
+        var mainEl = document.querySelector('main.card');
         applyLinkMode(getSelectedMode());
-        buttonsEl.addEventListener('click', onButtonsClick);
+        mainEl.addEventListener('click', onButtonsClick);
 
         document.querySelectorAll('input[name="linkMode"]').forEach(function (radio) {
           radio.addEventListener('change', function () {
