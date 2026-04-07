@@ -94,10 +94,41 @@
       color: var(--muted);
       text-align: center;
     }
+
+    .tg-env-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 0 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #052e16;
+      background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+    }
+
+    .tg-env-badge::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #15803d;
+      box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.35);
+    }
+
+    .tg-env-badge.is-visible {
+      display: inline-flex;
+    }
   </style>
 </head>
 <body>
   <main class="card">
+    <div id="tg-env-badge" class="tg-env-badge" role="status" aria-live="polite">Мы в Telegram</div>
     <h1>Ссылки</h1>
     <p>Откройте нужный вариант по кнопке ниже.</p>
 
@@ -129,5 +160,41 @@
 
     <div class="footer">Одностраничная HTML-страница с 4 кнопками</div>
   </main>
+  <script>
+    (function () {
+      function openExternalLink(url) {
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.openLink(url);
+        } else {
+          window.open(url, '_blank');
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        window.Telegram?.WebApp?.ready?.();
+
+        function revealTgBadge() {
+          var el = document.getElementById('tg-env-badge');
+          if (el && window.Telegram?.WebApp) {
+            el.classList.add('is-visible');
+          }
+        }
+        revealTgBadge();
+        [100, 500, 1500].forEach(function (ms) {
+          setTimeout(revealTgBadge, ms);
+        });
+
+        document.querySelectorAll('a.button-link').forEach(function (anchor) {
+          anchor.addEventListener('click', function (e) {
+            if (e.defaultPrevented) return;
+            if (e.button !== 0) return;
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            e.preventDefault();
+            openExternalLink(anchor.href);
+          });
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
