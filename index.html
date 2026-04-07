@@ -179,10 +179,113 @@
       font-size: 12px;
       font-weight: 500;
     }
+
+    .ua-panel {
+      margin: 0 0 22px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .ua-panel__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 14px;
+      margin-bottom: 12px;
+    }
+
+    .ua-panel__title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .ua-panel__hint {
+      margin: 0 0 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .ua-panel__hint code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .ua-hint-green {
+      color: #4ade80;
+    }
+
+    .ua-hint-amber {
+      color: #fbbf24;
+    }
+
+    .ua-indicators {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .ua-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+
+    .ua-tag--on {
+      color: #052e16;
+      background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .ua-tag--off {
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .ua-tag--on.ua-tag--webview {
+      color: #1c1917;
+      background: linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .ua-string {
+      margin: 0;
+      padding: 12px;
+      font-size: 11px;
+      line-height: 1.45;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 10px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 140px;
+      overflow: auto;
+    }
   </style>
 </head>
 <body>
   <main class="card">
+    <div class="ua-panel" aria-label="Сведения о User-Agent">
+      <div class="ua-panel__head">
+        <span class="ua-panel__title">navigator.userAgent</span>
+        <div class="ua-indicators">
+          <span class="ua-tag ua-tag--off" id="ua-indicator-telegram" title="/Telegram/i.test(navigator.userAgent)">Telegram</span>
+          <span class="ua-tag ua-tag--off" id="ua-indicator-webview" title="WebView эвристика по UA">WebView</span>
+        </div>
+      </div>
+      <p class="ua-panel__hint">
+        <strong>Telegram</strong> должен загореться <strong class="ua-hint-green">зелёным</strong>, если страница открыта во встроенном браузере Telegram
+        (в <code>userAgent</code> есть подстрока «Telegram»). <strong>WebView</strong> — <strong class="ua-hint-amber">янтарным</strong>, если сработала эвристика WebView по той же строке.
+      </p>
+      <pre class="ua-string" id="ua-string"></pre>
+    </div>
+
     <h1>Ссылки</h1>
     <p>Откройте нужный вариант по кнопке ниже.</p>
 
@@ -286,7 +389,39 @@
         openInNewBlankTab(url);
       }
 
+      function initUaPanel() {
+        var ua = navigator.userAgent || '';
+
+        // User-Agent содержит "Telegram"
+        var isTelegram = /Telegram/i.test(ua);
+
+        // Или более широко — любой WebView
+        var isWebView =
+          /(wv|WebView)/i.test(ua) ||
+          /Android.*Version\/[\d.]+.*Chrome/i.test(ua);
+
+        var pre = document.getElementById('ua-string');
+        if (pre) {
+          pre.textContent = ua;
+        }
+
+        var tg = document.getElementById('ua-indicator-telegram');
+        if (tg) {
+          tg.classList.toggle('ua-tag--on', isTelegram);
+          tg.classList.toggle('ua-tag--off', !isTelegram);
+        }
+
+        var wv = document.getElementById('ua-indicator-webview');
+        if (wv) {
+          wv.classList.toggle('ua-tag--on', isWebView);
+          wv.classList.toggle('ua-tag--off', !isWebView);
+          wv.classList.toggle('ua-tag--webview', isWebView);
+        }
+      }
+
       document.addEventListener('DOMContentLoaded', function () {
+        initUaPanel();
+
         var mainEl = document.querySelector('main.card');
         applyLinkMode(getSelectedMode());
         mainEl.addEventListener('click', onButtonsClick);
