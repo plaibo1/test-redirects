@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Определение Telegram WebView</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .result-card {
+            background: #f7f9fc;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .result-card.telegram {
+            background: linear-gradient(135deg, #29a9e1 0%, #1e88e5 100%);
+            color: white;
+        }
+
+        .result-card.browser {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .status {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        .details {
+            background: #f7f9fc;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .details h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-item {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #333;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge.telegram {
+            background: #29a9e1;
+            color: white;
+        }
+
+        .badge.browser {
+            background: #f5576c;
+            color: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            background: #f7f9fc;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Определение окружения</h1>
+            <p>Проверка, открыта ли страница в Telegram WebView</p>
+        </div>
+
+        <div class="content" id="app">
+            <!-- Сюда будет вставлен результат -->
+        </div>
+
+        <div class="footer">
+            <div>Метод: проверка глобальных объектов Telegram</div>
+        </div>
+    </div>
+
+    <script>
+        // Функция определения Telegram WebView
+        function detectTelegramWebView() {
+            // Проверяем наличие объектов Telegram
+            const hasTelegramProxy = !!window.TelegramWebviewProxy;
+            const hasTelegramWebView = !!(window.Telegram && window.Telegram.WebView);
+            const hasTelegramMiniApp = !!(window.Telegram && window.Telegram.WebApp);
+            
+            // Дополнительная проверка для старых версий
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isOldTelegram = userAgent.includes('telegram') || userAgent.includes('tgweb');
+            
+            // Определяем тип окружения
+            let environment = 'browser';
+            let details = {
+                hasTelegramProxy: hasTelegramProxy,
+                hasTelegramWebView: hasTelegramWebView,
+                hasTelegramMiniApp: hasTelegramMiniApp,
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                vendor: navigator.vendor
+            };
+            
+            if (hasTelegramProxy || hasTelegramWebView) {
+                environment = 'telegram';
+            } else if (hasTelegramMiniApp) {
+                environment = 'telegram_miniapp';
+            } else if (isOldTelegram) {
+                environment = 'telegram_old';
+            }
+            
+            return { environment, details };
+        }
+
+        // Получение информации об устройстве
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let device = 'Неизвестно';
+            let os = 'Неизвестно';
+            
+            if (/(ipad|iphone|ipod)/i.test(ua)) {
+                device = 'iOS';
+                os = 'iOS';
+            } else if (/android/i.test(ua)) {
+                device = 'Android';
+                os = 'Android';
+            } else if (/windows/i.test(ua)) {
+                device = 'Desktop';
+                os = 'Windows';
+            } else if (/mac/i.test(ua)) {
+                device = 'Desktop';
+                os = 'macOS';
+            } else if (/linux/i.test(ua)) {
+                device = 'Desktop';
+                os = 'Linux';
+            }
+            
+            return { device, os };
+        }
+
+        // Отрисовка результата
+        function renderResult() {
+            const app = document.getElementById('app');
+            const result = detectTelegramWebView();
+            const deviceInfo = getDeviceInfo();
+            const isTelegram = result.environment !== 'browser';
+            
+            // Определяем иконку и текст
+            let icon = '🌐';
+            let status = 'Обычный браузер';
+            let description = 'Страница открыта в стандартном браузере или встроенном WebView другого приложения';
+            let badgeClass = 'browser';
+            
+            if (result.environment === 'telegram') {
+                icon = '📱✈️';
+                status = 'Telegram WebView';
+                description = 'Страница открыта во встроенном браузере Telegram!';
+                badgeClass = 'telegram';
+            } else if (result.environment === 'telegram_miniapp') {
+                icon = '🤖🎮';
+                status = 'Telegram Mini App';
+                description = 'Страница запущена как Telegram Mini App!';
+                badgeClass = 'telegram';
+            } else if (result.environment === 'telegram_old') {
+                icon = '📱⚠️';
+                status = 'Telegram (старая версия)';
+                description = 'Страница открыта в старой версии Telegram WebView';
+                badgeClass = 'telegram';
+            }
+            
+            // Формируем HTML
+            const html = `
+                <div class="result-card ${isTelegram ? 'telegram' : 'browser'}">
+                    <div class="icon">${icon}</div>
+                    <div class="status">${status}</div>
+                    <div class="description">${description}</div>
+                </div>
+                
+                <div class="details">
+                    <h3>
+                        🔧 Детальная информация
+                        <span class="badge ${badgeClass}">
+                            ${isTelegram ? 'Telegram' : 'Browser'}
+                        </span>
+                    </h3>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">🔍 TelegramWebviewProxy</div>
+                        <div class="detail-value">${result.details.hasTelegramProxy ? '✅ Присутствует' : '❌ Отсутствует'}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">📦 Telegram.WebView</div>
+                        <div class="detail-value">${result.details.hasTelegramWebView ? '✅ Присутствует' : '❌ Отсутствует'}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">🎮 Telegram.WebApp</div>
+                        <div class="detail-value">${result.details.hasTelegramMiniApp ? '✅ Присутствует' : '❌ Отсутствует'}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">📱 Устройство</div>
+                        <div class="detail-value">${deviceInfo.device} (${deviceInfo.os})</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">🌍 User Agent</div>
+                        <div class="detail-value">${result.details.userAgent}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">🏢 Platform</div>
+                        <div class="detail-value">${result.details.platform || 'Не определено'}</div>
+                    </div>
+                </div>
+                
+                <button onclick="location.reload()">
+                    🔄 Проверить заново
+                </button>
+            `;
+            
+            app.innerHTML = html;
+        }
+        
+        // Запускаем отрисовку при загрузке страницы
+        renderResult();
+        
+        // Также можно добавить лог в консоль для разработчика
+        console.log('=== Информация об окружении ===');
+        const debugInfo = detectTelegramWebView();
+        console.log('Окружение:', debugInfo.environment);
+        console.log('Детали:', debugInfo.details);
+    </script>
+</body>
+</html>

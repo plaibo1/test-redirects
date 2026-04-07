@@ -202,6 +202,19 @@
       color: var(--text);
     }
 
+    .ua-panel__link {
+      font-size: 12px;
+      font-weight: 600;
+      color: #93c5fd;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .ua-panel__link:hover {
+      color: #bfdbfe;
+      text-decoration: underline;
+    }
+
     .ua-panel__hint {
       margin: 0 0 12px;
       font-size: 12px;
@@ -226,6 +239,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      margin-left: auto;
     }
 
     .ua-tag {
@@ -274,6 +288,7 @@
     <div class="ua-panel" aria-label="Сведения о User-Agent">
       <div class="ua-panel__head">
         <span class="ua-panel__title">navigator.userAgent</span>
+        <a class="ua-panel__link" href="/agent.html">/agent.html</a>
         <div class="ua-indicators">
           <span class="ua-tag ua-tag--off" id="ua-indicator-telegram" title="/Telegram/i.test(navigator.userAgent)">Telegram</span>
           <span class="ua-tag ua-tag--off" id="ua-indicator-webview" title="WebView эвристика по UA">WebView</span>
