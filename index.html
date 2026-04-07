@@ -95,65 +95,130 @@
       text-align: center;
     }
 
-    .tg-env-badge {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      max-width: 100%;
-      margin: 0 0 14px;
-      padding: 6px 12px;
-      border-radius: 999px;
+    .link-mode {
+      margin: 0 0 22px;
+      padding: 14px 16px 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .link-mode legend {
+      padding: 0 8px;
       font-size: 13px;
       font-weight: 600;
-      color: #052e16;
-      background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+      color: var(--text);
     }
 
-    .tg-env-badge::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #15803d;
-      box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.35);
+    .link-mode__hint {
+      margin: 6px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
     }
 
-    .tg-env-badge.is-visible {
-      display: inline-flex;
+    .link-mode__row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .link-mode label {
+      display: block;
+      cursor: pointer;
+    }
+
+    .link-mode input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .link-mode__pill {
+      display: block;
+      padding: 11px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .link-mode label:hover .link-mode__pill {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .link-mode input:focus-visible + .link-mode__pill {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .link-mode input:checked + .link-mode__pill {
+      background: rgba(37, 99, 235, 0.35);
+      border-color: rgba(37, 99, 235, 0.55);
+      color: var(--text);
+    }
+
+    .link-mode__pill code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
   <main class="card">
-    <div id="tg-env-badge" class="tg-env-badge" role="status" aria-live="polite">Мы в Telegram</div>
     <h1>Ссылки</h1>
     <p>Откройте нужный вариант по кнопке ниже.</p>
 
+    <fieldset class="link-mode">
+      <legend>Режим открытия ссылок</legend>
+      <p class="link-mode__hint">Выберите, как вести себя ссылкам ниже.</p>
+      <div class="link-mode__row">
+        <label>
+          <input type="radio" name="linkMode" value="1" checked />
+          <span class="link-mode__pill">1 — как сейчас: <code>target="_blank"</code> в HTML</span>
+        </label>
+        <label>
+          <input type="radio" name="linkMode" value="2" />
+          <span class="link-mode__pill">2 — без новой вкладки (без <code>target</code>)</span>
+        </label>
+        <label>
+          <input type="radio" name="linkMode" value="3" />
+          <span class="link-mode__pill">3 — только JS: <code>window.open(url, '_blank')</code>, <code>url</code> из атрибута <code>href</code></span>
+        </label>
+      </div>
+    </fieldset>
+
     <div class="buttons">
-      <a class="button-link" href="https://t.leads.tech/click/1401/676/?sub1=zaimivsemru-of-list-nebusfinance-676&amp;sub2=none-none&amp;sub3=none&amp;sub4=none&amp;sub5=none&amp;sub6=none&amp;sub7=none&amp;sub8=we_website%3A6169%3Bwe_ws%3A23818%3Bwe_offer%3A666%3Bltt_offer%3A676%3Bwe_position%3A4%3Bwe_webmaster%3A778%3Bltt_webmaster%3A1401%3Bvisit_id%3A1650927758%3Bpers_model%3Anone%3Bsplit%3Aoff%3Butm_src%3Anone%3Bwm_id%3Anone%3BClientID%3A1774535110931852774%3B&amp;sub9=zaimivsemru&amp;sub10=%7Bcid%7D&amp;erid=2W5zFK5yusW" target="_blank" rel="noopener" referrerpolicy="unsafe-url">
+      <a class="button-link" href="https://t.leads.tech/click/1401/676/?sub1=zaimivsemru-of-list-nebusfinance-676&amp;sub2=none-none&amp;sub3=none&amp;sub4=none&amp;sub5=none&amp;sub6=none&amp;sub7=none&amp;sub8=we_website%3A6169%3Bwe_ws%3A23818%3Bwe_offer%3A666%3Bltt_offer%3A676%3Bwe_position%3A4%3Bwe_webmaster%3A778%3Bltt_webmaster%3A1401%3Bvisit_id%3A1650927758%3Bpers_model%3Anone%3Bsplit%3Aoff%3Butm_src%3Anone%3Bwm_id%3Anone%3BClientID%3A1774535110931852774%3B&amp;sub9=zaimivsemru&amp;sub10=%7Bcid%7D&amp;erid=2W5zFK5yusW" target="_blank" rel="noreferrer">
         <button type="button">Кнопка 1 — с ERID</button>
       </a>
 
-      <a class="button-link" href="https://t.leads.tech/click/1401/676/?sub1=zaimivsemru-of-list-nebusfinance-676&amp;sub2=none-none&amp;sub3=none&amp;sub4=none&amp;sub5=none&amp;sub6=none&amp;sub7=none&amp;sub8=we_website%3A6169%3Bwe_ws%3A23818%3Bwe_offer%3A666%3Bltt_offer%3A676%3Bwe_position%3A4%3Bwe_webmaster%3A778%3Bltt_webmaster%3A1401%3Bvisit_id%3A1650927758%3Bpers_model%3Anone%3Bsplit%3Aoff%3Butm_src%3Anone%3Bwm_id%3Anone%3BClientID%3A1774535110931852774%3B&amp;sub9=zaimivsemru&amp;sub10=%7Bcid%7D&amp;erid=" target="_blank" rel="noopener" referrerpolicy="unsafe-url">
+      <a class="button-link" href="https://t.leads.tech/click/1401/676/?sub1=zaimivsemru-of-list-nebusfinance-676&amp;sub2=none-none&amp;sub3=none&amp;sub4=none&amp;sub5=none&amp;sub6=none&amp;sub7=none&amp;sub8=we_website%3A6169%3Bwe_ws%3A23818%3Bwe_offer%3A666%3Bltt_offer%3A676%3Bwe_position%3A4%3Bwe_webmaster%3A778%3Bltt_webmaster%3A1401%3Bvisit_id%3A1650927758%3Bpers_model%3Anone%3Bsplit%3Aoff%3Butm_src%3Anone%3Bwm_id%3Anone%3BClientID%3A1774535110931852774%3B&amp;sub9=zaimivsemru&amp;sub10=%7Bcid%7D&amp;erid=" target="_blank" rel="noreferrer">
         <button type="button">Кнопка 2 — пустой ERID</button>
       </a>
 
-      <a class="button-link" href="https://t.leads.tech/click/1401/676/?sub1=zaimivsemru-of-list-nebusfinance-676&amp;sub2=none-none&amp;sub3=none&amp;sub4=none&amp;sub5=none&amp;sub6=none&amp;sub7=none&amp;sub8=we_website%3A6169%3Bwe_ws%3A23818%3Bwe_offer%3A666%3Bltt_offer%3A676%3Bwe_position%3A4%3Bwe_webmaster%3A778%3Bltt_webmaster%3A1401%3Bvisit_id%3A1650927758%3Bpers_model%3Anone%3Bsplit%3Aoff%3Butm_src%3Anone%3Bwm_id%3Anone%3BClientID%3A1774535110931852774%3B&amp;sub9=zaimivsemru&amp;sub10=%7Bcid%7D" target="_blank" rel="noopener" referrerpolicy="unsafe-url">
+      <a class="button-link" href="https://t.leads.tech/click/1401/676/?sub1=zaimivsemru-of-list-nebusfinance-676&amp;sub2=none-none&amp;sub3=none&amp;sub4=none&amp;sub5=none&amp;sub6=none&amp;sub7=none&amp;sub8=we_website%3A6169%3Bwe_ws%3A23818%3Bwe_offer%3A666%3Bltt_offer%3A676%3Bwe_position%3A4%3Bwe_webmaster%3A778%3Bltt_webmaster%3A1401%3Bvisit_id%3A1650927758%3Bpers_model%3Anone%3Bsplit%3Aoff%3Butm_src%3Anone%3Bwm_id%3Anone%3BClientID%3A1774535110931852774%3B&amp;sub9=zaimivsemru&amp;sub10=%7Bcid%7D" target="_blank" rel="noreferrer">
         <button type="button">Кнопка 3 — без ERID</button>
       </a>
 
-      <a class="button-link" href="https://t.leads.tech/click/1401/676/" target="_blank" rel="noopener" referrerpolicy="unsafe-url">
+      <a class="button-link" href="https://t.leads.tech/click/1401/676/" target="_blank" rel="noreferrer">
         <button type="button">Кнопка 4 — базовая ссылка</button>
       </a>
 
-      <a class="button-link" href="https://nebusfinance.ru/" target="_blank" rel="noopener" referrerpolicy="unsafe-url">
+      <a class="button-link" href="https://nebusfinance.ru/" target="_blank" rel="noreferrer">
         <button type="button">Кнопка 5 — прямая</button>
       </a>
 
-      <a class="button-link" href="https://it-leads.site/offer_redirect_erid.html" target="_blank" rel="noopener" referrerpolicy="unsafe-url">
+      <a class="button-link" href="https://it-leads.site/offer_redirect_erid.html" target="_blank" rel="noreferrer">
         <button type="button">Кнопка 6 — proxy редирект</button>
       </a>
     </div>
@@ -162,35 +227,52 @@
   </main>
   <script>
     (function () {
-      function openExternalLink(url) {
-        if (window.Telegram?.WebApp) {
-          window.Telegram.WebApp.openLink(url);
-        } else {
-          window.open(url, '_blank');
-        }
+      var MODE_HTML_BLANK = '1';
+      var MODE_SAME_TAB = '2';
+      var MODE_JS_BLANK = '3';
+
+      function getSelectedMode() {
+        var el = document.querySelector('input[name="linkMode"]:checked');
+        return el ? el.value : MODE_HTML_BLANK;
+      }
+
+      function applyLinkMode(mode) {
+        document.querySelectorAll('a.button-link').forEach(function (a) {
+          a.rel = 'noreferrer';
+          if (mode === MODE_HTML_BLANK) {
+            a.target = '_blank';
+          } else {
+            a.removeAttribute('target');
+          }
+        });
+      }
+
+      /** То же, что window.open('https://nebusfinance.ru/', '_blank'), но url задаётся из href ссылки. */
+      function openInNewBlankTab(url) {
+        window.open(url, '_blank');
+      }
+
+      function onButtonsClick(e) {
+        if (getSelectedMode() !== MODE_JS_BLANK) return;
+        var a = e.target.closest('a.button-link');
+        if (!a) return;
+        if (e.defaultPrevented) return;
+        if (e.button !== 0) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        var url = a.getAttribute('href');
+        if (!url) return;
+        e.preventDefault();
+        openInNewBlankTab(url);
       }
 
       document.addEventListener('DOMContentLoaded', function () {
-        window.Telegram?.WebApp?.ready?.();
+        var buttonsEl = document.querySelector('.buttons');
+        applyLinkMode(getSelectedMode());
+        buttonsEl.addEventListener('click', onButtonsClick);
 
-        function revealTgBadge() {
-          var el = document.getElementById('tg-env-badge');
-          if (el && window.Telegram?.WebApp) {
-            el.classList.add('is-visible');
-          }
-        }
-        revealTgBadge();
-        [100, 500, 1500].forEach(function (ms) {
-          setTimeout(revealTgBadge, ms);
-        });
-
-        document.querySelectorAll('a.button-link').forEach(function (anchor) {
-          anchor.addEventListener('click', function (e) {
-            if (e.defaultPrevented) return;
-            if (e.button !== 0) return;
-            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-            e.preventDefault();
-            openExternalLink(anchor.href);
+        document.querySelectorAll('input[name="linkMode"]').forEach(function (radio) {
+          radio.addEventListener('change', function () {
+            applyLinkMode(getSelectedMode());
           });
         });
       });
