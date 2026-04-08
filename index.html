@@ -180,6 +180,78 @@
       font-weight: 500;
     }
 
+    .custom-link-panel {
+      margin: 0 0 22px;
+      padding: 14px 16px 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .custom-link-panel__title {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .custom-link-panel__hint {
+      margin: 0 0 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .custom-link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .custom-link-input {
+      flex: 1;
+      min-width: 0;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: var(--text);
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+    }
+
+    .custom-link-input:focus {
+      border-color: rgba(37, 99, 235, 0.65);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .custom-link-input::placeholder {
+      color: var(--muted);
+    }
+
+    button.custom-link-add {
+      width: auto;
+      flex-shrink: 0;
+      padding: 12px 18px;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
+    }
+
+    .custom-link-error {
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: #f87171;
+      line-height: 1.4;
+    }
+
+    .custom-link-error[hidden] {
+      display: none !important;
+    }
+
+    .custom-link-buttons {
+      margin-top: 14px;
+    }
+
     .ua-panel {
       margin: 0 0 22px;
       padding: 14px 16px;
@@ -323,6 +395,27 @@
       </div>
     </fieldset>
 
+    <div class="custom-link-panel">
+      <p class="custom-link-panel__title">Своя ссылка</p>
+      <p class="custom-link-panel__hint">
+        Вставьте URL и нажмите «Добавить» — появится кнопка с теми же правилами открытия, что и у остальных (режимы 1–3 выше). Разрешены только <code>http</code> и <code>https</code>.
+      </p>
+      <div class="custom-link-row">
+        <input
+          class="custom-link-input"
+          type="text"
+          id="custom-url-input"
+          placeholder="https://example.com/…"
+          enterkeyhint="done"
+          autocomplete="url"
+          spellcheck="false"
+        />
+        <button type="button" class="custom-link-add" id="custom-url-add">Добавить</button>
+      </div>
+      <p class="custom-link-error" id="custom-url-error" hidden></p>
+      <div class="buttons custom-link-buttons" id="custom-link-buttons"></div>
+    </div>
+
     <div class="buttons">
       <a class="button-link" href="https://t.leads.tech/click/1401/676/?sub1=zaimivsemru-of-list-nebusfinance-676&amp;sub2=none-none&amp;sub3=none&amp;sub4=none&amp;sub5=none&amp;sub6=none&amp;sub7=none&amp;sub8=we_website%3A6169%3Bwe_ws%3A23818%3Bwe_offer%3A666%3Bltt_offer%3A676%3Bwe_position%3A4%3Bwe_webmaster%3A778%3Bltt_webmaster%3A1401%3Bvisit_id%3A1650927758%3Bpers_model%3Anone%3Bsplit%3Aoff%3Butm_src%3Anone%3Bwm_id%3Anone%3BClientID%3A1774535110931852774%3B&amp;sub9=zaimivsemru&amp;sub10=%7Bcid%7D&amp;erid=2W5zFK5yusW" target="_blank" rel="noreferrer">
         <button type="button">Кнопка 1 — с ERID</button>
@@ -368,7 +461,6 @@
       </a>
     </div>
 
-    <div class="footer">Одностраничная HTML-страница с 4 кнопками</div>
   </main>
   <script>
     (function () {
@@ -408,6 +500,80 @@
         if (!url) return;
         e.preventDefault();
         openInNewBlankTab(url);
+      }
+
+      function normalizeCustomUrl(raw) {
+        var s = String(raw || '').trim();
+        if (!s) return null;
+        var u;
+        try {
+          u = new URL(s);
+        } catch (e1) {
+          try {
+            u = new URL('https://' + s);
+          } catch (e2) {
+            return null;
+          }
+        }
+        var p = u.protocol.toLowerCase();
+        if (p !== 'http:' && p !== 'https:') return null;
+        return u.href;
+      }
+
+      function buttonLabelForUrl(href) {
+        try {
+          var u = new URL(href);
+          var t = u.hostname + (u.pathname === '/' ? '' : u.pathname);
+          if (u.search) t += u.search;
+          if (t.length > 52) t = t.slice(0, 49) + '…';
+          return t || href;
+        } catch (e) {
+          return href;
+        }
+      }
+
+      function setCustomUrlError(msg) {
+        var el = document.getElementById('custom-url-error');
+        if (!el) return;
+        if (msg) {
+          el.textContent = msg;
+          el.hidden = false;
+        } else {
+          el.textContent = '';
+          el.hidden = true;
+        }
+      }
+
+      function addCustomLinkButton(href) {
+        var container = document.getElementById('custom-link-buttons');
+        if (!container) return;
+
+        var a = document.createElement('a');
+        a.className = 'button-link';
+        a.href = href;
+        a.rel = 'noreferrer';
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = buttonLabelForUrl(href);
+
+        a.appendChild(btn);
+        container.appendChild(a);
+        applyLinkMode(getSelectedMode());
+      }
+
+      function tryAddCustomLinkFromInput() {
+        var input = document.getElementById('custom-url-input');
+        if (!input) return;
+        var href = normalizeCustomUrl(input.value);
+        if (!href) {
+          setCustomUrlError('Укажите корректный адрес (например https://example.com).');
+          return;
+        }
+        setCustomUrlError('');
+        addCustomLinkButton(href);
+        input.value = '';
+        input.focus();
       }
 
       function initUaPanel() {
@@ -452,6 +618,23 @@
             applyLinkMode(getSelectedMode());
           });
         });
+
+        var customAdd = document.getElementById('custom-url-add');
+        var customInput = document.getElementById('custom-url-input');
+        if (customAdd) {
+          customAdd.addEventListener('click', tryAddCustomLinkFromInput);
+        }
+        if (customInput) {
+          customInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              tryAddCustomLinkFromInput();
+            }
+          });
+          customInput.addEventListener('input', function () {
+            setCustomUrlError('');
+          });
+        }
       });
     })();
   </script>
