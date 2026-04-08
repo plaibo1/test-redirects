@@ -362,13 +362,15 @@
         <span class="ua-panel__title">navigator.userAgent</span>
         <a class="ua-panel__link" href="/agent.html">/agent.html</a>
         <div class="ua-indicators">
-          <span class="ua-tag ua-tag--off" id="ua-indicator-telegram" title="/Telegram/i.test(navigator.userAgent)">Telegram</span>
-          <span class="ua-tag ua-tag--off" id="ua-indicator-webview" title="WebView эвристика по UA">WebView</span>
+          <span class="ua-tag ua-tag--off" id="ua-indicator-telegram" title="Как в agent.html: не browser (Proxy / WebView / WebApp / старый UA)">Telegram</span>
+          <span class="ua-tag ua-tag--off" id="ua-indicator-webview" title="Как в agent.html: TelegramWebviewProxy или Telegram.WebView">WebView</span>
         </div>
       </div>
       <p class="ua-panel__hint">
-        <strong>Telegram</strong> должен загореться <strong class="ua-hint-green">зелёным</strong>, если страница открыта во встроенном браузере Telegram
-        (в <code>userAgent</code> есть подстрока «Telegram»). <strong>WebView</strong> — <strong class="ua-hint-amber">янтарным</strong>, если сработала эвристика WebView по той же строке.
+        Та же логика, что на <a class="ua-panel__link" href="/agent.html">/agent.html</a>:
+        <strong>Telegram</strong> — <strong class="ua-hint-green">зелёный</strong>, если окружение не <code>browser</code>
+        (<code>TelegramWebviewProxy</code>, <code>Telegram.WebView</code>, <code>Telegram.WebApp</code> или в UA есть <code>telegram</code> / <code>tgweb</code>).
+        <strong>WebView</strong> — <strong class="ua-hint-amber">янтарный</strong>, если есть <code>TelegramWebviewProxy</code> или <code>Telegram.WebView</code>.
       </p>
       <pre class="ua-string" id="ua-string"></pre>
     </div>
@@ -576,16 +578,41 @@
         input.focus();
       }
 
+      /** Та же проверка, что detectTelegramWebView() в agent.html */
+      function detectTelegramWebView() {
+        var hasTelegramProxy = !!window.TelegramWebviewProxy;
+        var hasTelegramWebView = !!(window.Telegram && window.Telegram.WebView);
+        var hasTelegramMiniApp = !!(window.Telegram && window.Telegram.WebApp);
+        var userAgent = (navigator.userAgent || '').toLowerCase();
+        var isOldTelegram =
+          userAgent.indexOf('telegram') !== -1 || userAgent.indexOf('tgweb') !== -1;
+
+        var environment = 'browser';
+        if (hasTelegramProxy || hasTelegramWebView) {
+          environment = 'telegram';
+        } else if (hasTelegramMiniApp) {
+          environment = 'telegram_miniapp';
+        } else if (isOldTelegram) {
+          environment = 'telegram_old';
+        }
+
+        return {
+          environment: environment,
+          details: {
+            hasTelegramProxy: hasTelegramProxy,
+            hasTelegramWebView: hasTelegramWebView,
+            hasTelegramMiniApp: hasTelegramMiniApp,
+            userAgent: navigator.userAgent
+          }
+        };
+      }
+
       function initUaPanel() {
         var ua = navigator.userAgent || '';
-
-        // User-Agent содержит "Telegram"
-        var isTelegram = /Telegram/i.test(ua);
-
-        // Или более широко — любой WebView
-        var isWebView =
-          /(wv|WebView)/i.test(ua) ||
-          /Android.*Version\/[\d.]+.*Chrome/i.test(ua);
+        var result = detectTelegramWebView();
+        var isTelegramEnv = result.environment !== 'browser';
+        var isTelegramWebViewBridge =
+          result.details.hasTelegramProxy || result.details.hasTelegramWebView;
 
         var pre = document.getElementById('ua-string');
         if (pre) {
@@ -594,20 +621,23 @@
 
         var tg = document.getElementById('ua-indicator-telegram');
         if (tg) {
-          tg.classList.toggle('ua-tag--on', isTelegram);
-          tg.classList.toggle('ua-tag--off', !isTelegram);
+          tg.classList.toggle('ua-tag--on', isTelegramEnv);
+          tg.classList.toggle('ua-tag--off', !isTelegramEnv);
         }
 
         var wv = document.getElementById('ua-indicator-webview');
         if (wv) {
-          wv.classList.toggle('ua-tag--on', isWebView);
-          wv.classList.toggle('ua-tag--off', !isWebView);
-          wv.classList.toggle('ua-tag--webview', isWebView);
+          wv.classList.toggle('ua-tag--on', isTelegramWebViewBridge);
+          wv.classList.toggle('ua-tag--off', !isTelegramWebViewBridge);
+          wv.classList.toggle('ua-tag--webview', isTelegramWebViewBridge);
         }
       }
 
       document.addEventListener('DOMContentLoaded', function () {
         initUaPanel();
+        [100, 300, 1000].forEach(function (ms) {
+          setTimeout(initUaPanel, ms);
+        });
 
         var mainEl = document.querySelector('main.card');
         applyLinkMode(getSelectedMode());
